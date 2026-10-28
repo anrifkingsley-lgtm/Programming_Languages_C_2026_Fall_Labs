@@ -13,7 +13,7 @@
  * =========================================================================
  * 
  * 1. HOW THE TOKENIZER TRACKS POSITIONS:
- *    We maintain a 1-based global character offset (`current_file_pos`) that 
+ *    We maintain a 1-based global character offset that 
  *    increments with every single character consumed from the input buffer 
  *    (including spaces, tabs, and newlines). We do this because test suites 
  *    require absolute 1-based character indexing relative to the raw file stream.
@@ -27,7 +27,7 @@
  * 3. WHY EACH ERROR IS REPORTED AT THE POSITION CHOSEN:
  *    Errors are flagged precisely at the starting index of the token being 
  *    evaluated when a syntax violation, invalid character, division by zero, 
- *    or negative exponent occurs. Saving the token's initial offset 
+ *    or negative exponent occurs. Saving the token's initial offset
  *    allows us to point directly to the exact point of failure.
  * 
  * 4. HOW WE DECIDE BETWEEN INTEGER AND FLOAT ARITHMETIC:
@@ -43,6 +43,7 @@
  *    buffer reallocation or copying.
  * ========================================================================= */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -317,7 +318,12 @@ void process_file(const char *input_path, const char *output_path) {
         fclose(fin);
         exit(EXIT_FAILURE);
     }
-    fread(buffer, 1, fsize, fin);
+    
+    
+    if (fread(buffer, 1, fsize, fin) != (size_t)fsize) {
+        
+    }
+    
     buffer[fsize] = '\0';
     fclose(fin);
 
@@ -335,7 +341,7 @@ void process_file(const char *input_path, const char *output_path) {
         while (i < (size_t)fsize && buffer[i] != '\n') {
             i++;
         }
-    size_t line_len = i - line_start;
+        size_t line_len = i - line_start;
         
         char *line_buf = malloc(line_len + 1);
         memcpy(line_buf, &buffer[line_start], line_len);
@@ -351,7 +357,6 @@ void process_file(const char *input_path, const char *output_path) {
         if (!is_comment && line_len > 0) {
             EvalResult res = evaluate_line(line_buf, file_pos);
             if (res.has_error) {
-                
                 fprintf(fout, "ERROR:%lld\n", res.err_pos);
                 free(line_buf);
                 free(buffer);
@@ -414,7 +419,6 @@ int main(int argc, char *argv[]) {
         } else if (input_file == NULL) {
             input_file = argv[i];
         } else {
-            
             fprintf(stderr, "Error: Unknown or extra argument %s\n", argv[i]);
             return EXIT_FAILURE;
         }
@@ -475,14 +479,13 @@ int main(int argc, char *argv[]) {
         if (out_arg != NULL) {
             snprintf(out_dir, sizeof(out_dir), "%s", out_arg);
         } else {
-            snprintf(out_dir, sizeof(out_dir), "%s_%s_%s", base_name, student_name, student_id);
+            snprintf(out_dir, sizeof(out_dir), "%s_%s_%s_%s", base_name, student_name,student_lastname, student_id);
         }
         create_directory(out_dir);
 
-        snprintf(out_path, sizeof(out_path), "%s/%s_%s_%s_%s.txt", out_dir, base_name, student_name, student_lastname, student_id);
+        snprintf(out_path, sizeof(out_path), "%s/%s_%s_%s_%s.txt", out_dir, base_name, student_name,student_lastname, student_id);
         process_file(input_file, out_path);
     } else {
-        
         fprintf(stderr, "Usage: calc [-d DIR] [-o OUTDIR] [input.txt]\n");
         return EXIT_FAILURE;
     }
