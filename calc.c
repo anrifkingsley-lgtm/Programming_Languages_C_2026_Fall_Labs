@@ -6,6 +6,7 @@
  * AI (CHATGPT) prompts used: 
  * - "how to handle 1-based character position tracking including newlines and comments for error reporting in a file parser in C"
  * - "implementing recursive descent parser with right-associative exponentiation and precedence"
+ *-link chagpt: https://chatgpt.com/share/6ae19cf2-f82c-83ed-bfd7-c61e3f25ff30
  */
 
 /* =========================================================================
